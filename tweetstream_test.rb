@@ -36,6 +36,7 @@ TweetStream.configure do |config|
   config.auth_method        = :oauth
 end
 
+
 client = TweetStream::Client.new
 
 # client.follow(24480915) do |status|
@@ -75,8 +76,15 @@ def bust_paywall(status)
   # end
   
   #google queryify the headline
+  url = google_headlineify(raw_text)
   
-  #respond to tweet with 
+  consumer_key = OAuth::Consumer.new(KEYS[:consumer_key_string], KEYS[:consumer_secret_string])
+  access_token = OAuth::Token.new(KEYS[:access_token_string], KEYS[:access_secret_string])
+  handle = "@" + status.user.screen_name
+  #respond to tweet with link to google results
+
+  send_response_tweet(status.id, handle, url, consumer_key, access_token)
+  
 end
 
 def google_headlineify(text)
@@ -111,7 +119,7 @@ def send_response_tweet(tweet_id, user, google_link, consumer_key, access_token)
   # Issue the request.
   request.oauth! http, consumer_key, access_token
   http.start
-  response = http.request request
+  response = http.request(request)
 end
 
 # def economist_fetch_headline()
