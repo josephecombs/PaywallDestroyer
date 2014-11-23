@@ -37,19 +37,14 @@ TweetStream.configure do |config|
 end
 
 def bust_paywall(status)
-  
-  puts "made it inside bust_paywall method"
+
   #turn this back on in production later when you add more media entities
   # if status.user.screen_name == 'theeconomist'
   raw_text = economist_fetch_headline(status.urls[0].attrs[:expanded_url])
   # end
   
-  puts "raw text from page: " + raw_text
-  
   #google queryify the headline
   url = google_headlineify(raw_text)
-  
-  puts "google url: " + url
   
   consumer_key = OAuth::Consumer.new(KEYS[:consumer_key_string], KEYS[:consumer_secret_string])
   access_token = OAuth::Token.new(KEYS[:access_token_string], KEYS[:access_secret_string])
