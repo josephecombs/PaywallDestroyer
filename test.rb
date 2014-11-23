@@ -3,9 +3,10 @@ require 'oauth'
 require 'json'
 require 'open-uri'
 
-def dump_credentials
+def get_credentials
   temp_arr = []
   i = 0
+  #get your own keys if you are going to use this --> apps.twitter.com
   File.readlines('keys.txt').each do |line, idx|
     temp_arr[i] = line.gsub!("\n","")
     puts "aaa"
@@ -22,48 +23,39 @@ def dump_credentials
   keys
 end
 
-KEYS = dump_credentials
 
-puts KEYS
+def get_new_tweets(target_user, consumer_key, access_token)
+  
+end
 
-sleep(100)
+def get_google_link
+  
+end
 
+def send_response_tweet(tweet_id, google_link, consumer_key, access_token)
+  baseurl = "https://api.twitter.com"
+  path    = "/1.1/statuses/update.json"
+  address = URI("#{baseurl}#{path}")
+  request = Net::HTTP::Post.new address.request_uri
+  request.set_form_data(
+    status: "helpful link: #{google_link}",
+    in_reply_to_status_id: tweet_id
+  )
 
-# You will need to set your application type to
-# read/write on dev.twitter.com and regenerate your access
-# token.  Enter the new values here:
+  # Set up HTTP.
+  http             = Net::HTTP.new address.host, address.port
+  http.use_ssl     = true
+  http.verify_mode = OpenSSL::SSL::VERIFY_PEER
+
+  # Issue the request.
+  request.oauth! http, consumer_key, access_token
+  http.start
+  response = http.request request
+end
+
+KEYS = get_credentials
+
 consumer_key = OAuth::Consumer.new(KEYS[:consumer_key_string], KEYS[:consumer_secret_string])
 access_token = OAuth::Token.new(KEYS[:access_token_string], KEYS[:access_secret_string])
 
-
-
-# Note that the type of request has changed to POST.
-# The request parameters have also moved to the body
-# of the request instead of being put in the URL.
-baseurl = "https://api.twitter.com"
-path    = "/1.1/statuses/update.json"
-address = URI("#{baseurl}#{path}")
-request = Net::HTTP::Post.new address.request_uri
-request.set_form_data(
-  "status" => "just setting up my twttr bot, again",
-)
-
-# Set up HTTP.
-http             = Net::HTTP.new address.host, address.port
-http.use_ssl     = true
-http.verify_mode = OpenSSL::SSL::VERIFY_PEER
-
-# Issue the request.
-request.oauth! http, consumer_key, access_token
-http.start
-response = http.request request
-
-# Parse and print the Tweet if the response code was 200
-tweet = nil
-if response.code == '200' then
-  tweet = JSON.parse(response.body)
-  puts "Successfully sent #{tweet["text"]}"
-else
-  puts "Could not send the Tweet! " +
-  "Code:#{response.code} Body:#{response.body}"
-end
+send_response_tweet(536245096811745280, "test-google-link.com", consumer_key, access_token)
