@@ -3,10 +3,32 @@ require 'oauth'
 require 'json'
 require 'open-uri'
 
-# globals, TODO upcase variable names later
-require 'rubygems'
-require 'oauth'
-require 'json'
+def dump_credentials
+
+  
+  temp_arr = []
+  i = 0
+  File.readlines('keys.txt').each do |line, idx|
+    keys[i] = line
+    puts "aaa"
+    i += 1
+  end
+  
+  keys = {
+    consumer_key_string: "",
+    consumer_secret_string: "",
+    access_token_string: "",
+    access_secret_string: ""
+  }
+    
+  keys
+end
+
+KEYS = dump_credentials
+
+puts KEYS
+
+sleep(100)
 
 consumer_key_string = 'HPXnPN7CkMy4Rx68QXKhuvU7d'
 consumer_secret_string = 'HOeaqCB5HC9W7crD1lrMkS0s00oLx7KYLqDvdUCqPj8wNQGqxW'
@@ -15,11 +37,14 @@ access_token_string = '24480915-27KxpwZIIi3z6ZAQ6g0g0qofNpC1AAW6eKRrsh4Jg'
 access_secret_string = 'HypI7HSEs7BjfeiN3JBHZMv14ff3UoRGZgfOoZiliVnMx'
 
 
+
 # You will need to set your application type to
 # read/write on dev.twitter.com and regenerate your access
 # token.  Enter the new values here:
 consumer_key = OAuth::Consumer.new(consumer_key_string, consumer_secret_string)
 access_token = OAuth::Token.new(access_token_string, access_secret_string)
+
+
 
 # Note that the type of request has changed to POST.
 # The request parameters have also moved to the body
