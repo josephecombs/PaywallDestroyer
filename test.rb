@@ -4,11 +4,11 @@ require 'json'
 require 'open-uri'
 require 'nokogiri'
 
-def get_credentials
+def get_credentials(filename)
   temp_arr = []
   i = 0
   #get your own keys if you are going to use this --> apps.twitter.com
-  File.readlines('keys.txt').each do |line, idx|
+  File.readlines(filename).each do |line, idx|
     temp_arr[i] = line.gsub!("\n","")
     i += 1
   end
@@ -26,34 +26,55 @@ end
 
 
 def get_new_tweets(target_user, consumer_key, access_token)
-  
-end
-
-def get_top_google_link(headline, google_api_key)
-  url = google_headlineify(headline, google_api_key)
-  # doc = JSON.parse(open(url))
-  # puts doc
-  # sleep 100
-  
-  address = URI(url)
+  baseurl = "https://api.twitter.com"
+  path    = "/1.1/statuses/show.json"
+  query   = URI.encode_www_form("screen_name" => target_user)
+  address = URI("#{baseurl}#{path}?#{query}")
   request = Net::HTTP::Get.new address.request_uri
-  http = Net::HTTP.new address.host, address.port
-  
+
+  # Set up HTTP.
+  http             = Net::HTTP.new address.host, address.port
+  http.use_ssl     = true
+  http.verify_mode = OpenSSL::SSL::VERIFY_PEER
+
+  # Issue the request.
+  request.oauth! http, consumer_key, access_token
   http.start
-  response = http.request(request)
-  results = JSON.parse(response.body)
+  response = http.request request
   
-  puts results
-  # top_search_result = doc.css('li.card-section')
-  # puts top_search_result
-#https://www.google.com/#q=Russia+A+wounded+economy+It+is+closer+to+crisis+than+the+West+or+Vladimir+Putin+realized
 end
 
-def google_headlineify(text, google_api_key)
+# def get_top_google_link(headline, google_api_key)
+#   url = google_headlineify(headline, google_api_key)
+#   # doc = JSON.parse(open(url))
+#   # puts doc
+#   # sleep 100
+#
+#   address = URI(url)
+#   request = Net::HTTP::Get.new address.request_uri
+#   http = Net::HTTP.new address.host, address.port
+#
+#   http.start
+#   response = http.request(request)
+#   results = JSON.parse(response.body)
+#
+#   puts results
+#   # top_search_result = doc.css('li.card-section')
+#   # puts top_search_result
+# #https://www.google.com/#q=Russia+A+wounded+economy+It+is+closer+to+crisis+than+the+West+or+Vladimir+Putin+realized
+# end
+
+def google_headlineify(text)
   words_arr = text.split(" ")
-  url = "http://ajax.googleapis.com/ajax/services/search/web?v=1.0&key=AIzaSyCRLjxxwTkiHqYBVSp8LBrs31q9mcxzAGc&q="
-  words_arr.each do |word|
-    url += "+#{word}"
+  # doing it this way is basically too complicated.  Users will have to click top link
+  # url = "http://ajax.googleapis.com/ajax/services/search/web?v=1.0&key=AIzaSyCRLjxxwTkiHqYBVSp8LBrs31q9mcxzAGc&q="
+  url = "https://www.google.com/#q="
+  words_arr.each_with_index do |word, idx|
+    if idx == 0
+      url += "#{word}"
+    else
+      url += "+#{word}"
+    end
   end
   
   url
@@ -80,11 +101,12 @@ def send_response_tweet(tweet_id, user, google_link, consumer_key, access_token)
   response = http.request request
 end
 
-KEYS = get_credentials
+KEYS = get_credentials('keys.txt')
 
+target_user="@theeconomist"
 consumer_key = OAuth::Consumer.new(KEYS[:consumer_key_string], KEYS[:consumer_secret_string])
 access_token = OAuth::Token.new(KEYS[:access_token_string], KEYS[:access_secret_string])
 
-get_top_google_link("Russia A Wounded economy It is closer to crisis than the West or Vladimir Putin realized", KEYS[:google_api_key])
 
-#send_response_tweet("536245096811745280", "@josephcombs", "test-google-linKK.com", consumer_key, access_token)
+query = google_headlineify("Russia A Wounded economy")
+send_response_tweet("536245096811745280", "@josephcombs", query, consumer_key, access_token)
