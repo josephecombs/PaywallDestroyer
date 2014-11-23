@@ -36,47 +36,20 @@ TweetStream.configure do |config|
   config.auth_method        = :oauth
 end
 
-
-client = TweetStream::Client.new
-
-# client.follow(24480915) do |status|
-#   puts (status.methods - Array.methods)
-#   puts "========================"
-#   ##DEPRECATED METHOD##
-#   puts status.user[:screen_name]
-#   ##NEW METHOD##
-#   puts "new way hopefully works:"
-#   puts status.user.screen_name
-#   puts "========================"
-#   puts status.text
-#   puts "========================"
-#   puts status.id
-#   puts "========================"
-#   puts status.urls
-#   puts "========================"
-#   p status.urls
-#   puts "========================"
-#   puts status.user_mentions[0].attrs[:screen_name]
-#   #####CORRECT !!! - gets the url from the tweet######
-#   puts status.urls[0].attrs[:expanded_url]
-#   # p status.urls.attrs[:url]
-#   puts "========================"
-#   puts status.urls.attrs[:url]
-#
-#   # puts status[:entities][:urls][:expanded_url]
-#
-#   bust_paywall(status)
-# end
-
 def bust_paywall(status)
   
+  puts "made it inside bust_paywall method"
   #turn this back on in production later when you add more media entities
   # if status.user.screen_name == 'theeconomist'
-    raw_text = economist_fetch_headline(status.urls[0].attrs[:expanded_url])
+  raw_text = economist_fetch_headline(status.urls[0].attrs[:expanded_url])
   # end
+  
+  puts "raw text from page: " + raw_text
   
   #google queryify the headline
   url = google_headlineify(raw_text)
+  
+  puts "google url: " + url
   
   consumer_key = OAuth::Consumer.new(KEYS[:consumer_key_string], KEYS[:consumer_secret_string])
   access_token = OAuth::Token.new(KEYS[:access_token_string], KEYS[:access_secret_string])
@@ -84,7 +57,6 @@ def bust_paywall(status)
   #respond to tweet with link to google results
 
   send_response_tweet(status.id, handle, url, consumer_key, access_token)
-  
 end
 
 def google_headlineify(text)
@@ -107,7 +79,7 @@ def send_response_tweet(tweet_id, user, google_link, consumer_key, access_token)
   address = URI("#{baseurl}#{path}")
   request = Net::HTTP::Post.new address.request_uri
   request.set_form_data(
-    status: "helpful link for #{user} readers: #{google_link}",
+    status: "#{user} readers, click here if paywalled: #{google_link}",
     in_reply_to_status_id: tweet_id
   )
 
@@ -124,10 +96,46 @@ end
 
 # def economist_fetch_headline()
 def economist_fetch_headline(url)
+  puts url
   doc = Nokogiri::HTML(open(url))
   # doc = Nokogiri::HTML(open('http://www.economist.com/news/leaders/21633813-it-closer-crisis-west-or-vladimir-putin-realise-wounded-economy'))
   h2 = doc.css('h2.fly-title').text
+  puts h2
   h3 = doc.css('h3.headline').text
+  puts h3
   raw_headline = h2 + " " + h3
   raw_headline
 end
+
+client = TweetStream::Client.new
+
+#me = 24480915
+#economist = 5988062
+
+client.follow(5988062) do |status|
+  # puts (status.methods - Array.methods)
+  # puts "========================"
+  # ##DEPRECATED METHOD##
+  # puts status.user[:screen_name]
+  # ##NEW METHOD##
+  # puts "new way hopefully works:"
+  # puts status.user.screen_name
+  # puts "========================"
+  # puts status.text
+  # puts "========================"
+  # puts status.id
+  # puts "========================"
+  # puts status.urls
+  # puts "========================"
+  # p status.urls
+  # puts "========================"
+  # #####CORRECT !!! - gets the url from the tweet######
+  # puts status.urls[0].attrs[:expanded_url]
+  # # p status.urls.attrs[:url]
+  # puts "========================"
+  #
+  # # puts status[:entities][:urls][:expanded_url]
+
+  bust_paywall(status)
+end
+
