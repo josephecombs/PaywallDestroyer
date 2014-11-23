@@ -2,3 +2,9 @@ HPXnPN7CkMy4Rx68QXKhuvU7d
 HOeaqCB5HC9W7crD1lrMkS0s00oLx7KYLqDvdUCqPj8wNQGqxW
 24480915-27KxpwZIIi3z6ZAQ6g0g0qofNpC1AAW6eKRrsh4Jg
 HypI7HSEs7BjfeiN3JBHZMv14ff3UoRGZgfOoZiliVnMx
+
+keep top 4 lines of this file in the order of the keys shown below:
+consumer_key_string: temp_arr[0],
+consumer_secret_string: temp_arr[1],
+access_token_string: temp_arr[2],
+access_secret_string: temp_arr[3]

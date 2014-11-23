@@ -4,23 +4,21 @@ require 'json'
 require 'open-uri'
 
 def dump_credentials
-
-  
   temp_arr = []
   i = 0
   File.readlines('keys.txt').each do |line, idx|
-    keys[i] = line
+    temp_arr[i] = line.gsub!("\n","")
     puts "aaa"
     i += 1
   end
   
   keys = {
-    consumer_key_string: "",
-    consumer_secret_string: "",
-    access_token_string: "",
-    access_secret_string: ""
+    consumer_key_string: temp_arr[0],
+    consumer_secret_string: temp_arr[1],
+    access_token_string: temp_arr[2],
+    access_secret_string: temp_arr[3]
   }
-    
+  
   keys
 end
 
@@ -30,19 +28,12 @@ puts KEYS
 
 sleep(100)
 
-consumer_key_string = 'HPXnPN7CkMy4Rx68QXKhuvU7d'
-consumer_secret_string = 'HOeaqCB5HC9W7crD1lrMkS0s00oLx7KYLqDvdUCqPj8wNQGqxW'
-
-access_token_string = '24480915-27KxpwZIIi3z6ZAQ6g0g0qofNpC1AAW6eKRrsh4Jg'
-access_secret_string = 'HypI7HSEs7BjfeiN3JBHZMv14ff3UoRGZgfOoZiliVnMx'
-
-
 
 # You will need to set your application type to
 # read/write on dev.twitter.com and regenerate your access
 # token.  Enter the new values here:
-consumer_key = OAuth::Consumer.new(consumer_key_string, consumer_secret_string)
-access_token = OAuth::Token.new(access_token_string, access_secret_string)
+consumer_key = OAuth::Consumer.new(KEYS[:consumer_key_string], KEYS[:consumer_secret_string])
+access_token = OAuth::Token.new(KEYS[:access_token_string], KEYS[:access_secret_string])
 
 
 
