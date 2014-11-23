@@ -3,6 +3,7 @@ require 'oauth'
 require 'json'
 require 'open-uri'
 require 'nokogiri'
+require 'tweetstream'
 
 def get_credentials(filename)
   temp_arr = []
