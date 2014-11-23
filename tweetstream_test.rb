@@ -39,19 +39,20 @@ end
 def bust_paywall(status)
 
   #turn this back on in production later when you add more media entities
-  # if status.user.screen_name == 'theeconomist'
-  raw_text = economist_fetch_headline(status.urls[0].attrs[:expanded_url])
-  # end
+  if status.user.screen_name == 'theeconomist'
+    raw_text = economist_fetch_headline(status.urls[0].attrs[:expanded_url])
   
-  #google queryify the headline
-  url = google_headlineify(raw_text)
   
-  consumer_key = OAuth::Consumer.new(KEYS[:consumer_key_string], KEYS[:consumer_secret_string])
-  access_token = OAuth::Token.new(KEYS[:access_token_string], KEYS[:access_secret_string])
-  handle = "@" + status.user.screen_name
-  #respond to tweet with link to google results
+    #google queryify the headline
+    url = google_headlineify(raw_text)
+  
+    consumer_key = OAuth::Consumer.new(KEYS[:consumer_key_string], KEYS[:consumer_secret_string])
+    access_token = OAuth::Token.new(KEYS[:access_token_string], KEYS[:access_secret_string])
+    handle = "@" + status.user.screen_name
+    #respond to tweet with link to google results
 
-  send_response_tweet(status.id, handle, url, consumer_key, access_token)
+    send_response_tweet(status.id, handle, url, consumer_key, access_token)
+  end
 end
 
 def google_headlineify(text)
