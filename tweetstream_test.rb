@@ -37,11 +37,11 @@ TweetStream.configure do |config|
 end
 
 def bust_paywall(status)
-
+  puts "analyzed one tweet"
   #turn this back on in production later when you add more media entities
-  if status.user.screen_name == 'theeconomist'
+  if status.user.screen_name.downcase == 'theeconomist'
     raw_text = economist_fetch_headline(status.urls[0].attrs[:expanded_url])
-  
+    # raw_text = "test tweet headline"
   
     #google queryify the headline
     url = google_headlineify(raw_text)
@@ -108,12 +108,12 @@ client = TweetStream::Client.new
 #me = 24480915
 #economist = 5988062
 
-client.follow(5988062) do |status|
+client.follow(24480915) do |status|
   # puts (status.methods - Array.methods)
   # puts "========================"
-  # ##DEPRECATED METHOD##
-  # puts status.user[:screen_name]
-  # ##NEW METHOD##
+  # # ##DEPRECATED METHOD##
+  # # puts status.user[:screen_name]
+  # # ##NEW METHOD##
   # puts "new way hopefully works:"
   # puts status.user.screen_name
   # puts "========================"
@@ -122,10 +122,10 @@ client.follow(5988062) do |status|
   # puts status.id
   # puts "========================"
   # puts status.urls
+  # # puts "========================"
+  # # p status.urls
   # puts "========================"
-  # p status.urls
-  # puts "========================"
-  # #####CORRECT !!! - gets the url from the tweet######
+  #####CORRECT !!! - gets the url from the tweet######
   # puts status.urls[0].attrs[:expanded_url]
   # # p status.urls.attrs[:url]
   # puts "========================"
