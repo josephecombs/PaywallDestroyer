@@ -108,7 +108,7 @@ client = TweetStream::Client.new
 #me = 24480915
 #economist = 5988062
 
-client.follow(24480915) do |status|
+client.follow(5988062) do |status|
   # puts (status.methods - Array.methods)
   # puts "========================"
   # # ##DEPRECATED METHOD##
