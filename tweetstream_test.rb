@@ -38,8 +38,10 @@ end
 
 def bust_paywall(status)
   puts "analyzed one tweet"
+  puts status.text
   #turn this back on in production later when you add more media entities
   if status.user.screen_name.downcase == 'theeconomist'
+    puts "analyzed one economist tweet"
     raw_text = economist_fetch_headline(status.urls[0].attrs[:expanded_url])
     # raw_text = "test tweet headline"
   
