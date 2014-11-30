@@ -52,8 +52,9 @@ def bust_paywall(status)
     access_token = OAuth::Token.new(KEYS[:access_token_string], KEYS[:access_secret_string])
     handle = "@" + status.user.screen_name
     #respond to tweet with link to google results
-
-    send_response_tweet(status.id, handle, url, consumer_key, access_token)
+    unless (url ==  "https://www.google.com/#q=")
+      send_response_tweet(status.id, handle, url, consumer_key, access_token)
+    end
   end
 end
 
