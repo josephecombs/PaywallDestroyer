@@ -7,9 +7,9 @@ require 'tweetstream'
 
 
 def get_credentials(filename)
+  #get your own keys if you are going to use this --> apps.twitter.com
   temp_arr = []
   i = 0
-  #get your own keys if you are going to use this --> apps.twitter.com
   File.readlines(filename).each do |line, idx|
     temp_arr[i] = line.gsub!("\n","")
     i += 1
@@ -61,10 +61,11 @@ def google_headlineify(text)
   words_arr = text.split(" ")
   url = "https://www.google.com/#q="
   words_arr.each_with_index do |word, idx|
+    temp_word = word.gsub(/[^a-zA-Z0-9 ]/,"")
     if idx == 0
-      url += "#{word}"
+      url += "#{temp_word}"
     else
-      url += "+#{word}"
+      url += "+#{temp_word}"
     end
   end
   
