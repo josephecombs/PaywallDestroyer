@@ -36,14 +36,15 @@ TweetStream.configure do |config|
   config.auth_method        = :oauth
 end
 
-def bust_paywall(status)
+def bust_paywall(status, publication_arr)
   puts "analyzed one tweet"
   puts status.text
   #turn this back on in production later when you add more media entities
-  if status.user.screen_name.downcase == 'theeconomist'
+  if status.user.screen_name.downcase == publication_arr[1]
     puts "analyzed one economist tweet"
-    raw_text = economist_fetch_headline(status.urls[0].attrs[:expanded_url])
-  
+    # raw_text = economist_fetch_headline(status.urls[0].attrs[:expanded_url])
+    raw_text = send((publication_arr[2].to_s + '_fetch_headline').to_sym, status.urls[0].attrs[:expanded_url])
+
     #google queryify the headline
     url = google_headlineify(raw_text)
   
@@ -94,24 +95,32 @@ def send_response_tweet(tweet_id, user, google_link, consumer_key, access_token)
   response = http.request(request)
 end
 
-def economist_fetch_headline(url)
-  doc = Nokogiri::HTML(open(url))
-  # doc = Nokogiri::HTML(open('http://www.economist.com/news/leaders/21633813-it-closer-crisis-west-or-vladimir-putin-realise-wounded-economy'))
-  h2 = doc.css('h2.fly-title').text
-  puts h2
-  h3 = doc.css('h3.headline').text
-  puts h3
-  raw_headline = h2 + " " + h3
-  raw_headline
-end
+# def economist_fetch_headline(url)
+#   #this method accepts a url of a news article and returns text
+#   doc = Nokogiri::HTML(open(url))
+#   # doc = Nokogiri::HTML(open('http://www.economist.com/news/leaders/21633813-it-closer-crisis-west-or-vladimir-putin-realise-wounded-economy'))
+#   h2 = doc.css('h2.fly-title').text
+#   puts h2
+#   h3 = doc.css('h3.headline').text
+#   puts h3
+#   raw_headline = h2 + " " + h3
+#   raw_headline
+# end
 
 client = TweetStream::Client.new
 
-#me = 24480915
-#economist = 5988062
-#FT = 18949452
+#keys must be named according to convention - economist -> economist_fetch_headline; financial_times -> financial_times_fetch_headline
+ARGS_MAP = {
+  me: [24480915, 'josephcombs', :me],
+  economist: [5988062, 'theeconomist', :economist],
+  financial_times: [18949452, 'FT', :financial_times]
+}
 
-client.follow(5988062) do |status|
+puts (ARGS_MAP[:me])
+puts (ARGV[0].to_sym)
+puts (ARGS_MAP[ARGV[0].to_sym])
+
+client.follow(ARGS_MAP[ARGV[0][0].to_sym]) do |status|
   # puts (status.methods - Array.methods)
   # puts "========================"
   # # ##DEPRECATED METHOD##
@@ -135,7 +144,8 @@ client.follow(5988062) do |status|
   #
   # # puts status[:entities][:urls][:expanded_url]
 
-  #bust_paywall(status)
-  puts "works"
+  bust_paywall(status, ARGS_MAP[ARGV[0]])
+  # puts "hi joe!"
+  # puts ARGV[0]
 end
 
