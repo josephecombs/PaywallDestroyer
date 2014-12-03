@@ -4,7 +4,7 @@ require 'json'
 require 'open-uri'
 require 'nokogiri'
 require 'tweetstream'
-
+Dir["/site_specific_logic/*.rb"].each {|file| require file }
 
 def get_credentials(filename)
   #get your own keys if you are going to use this --> apps.twitter.com
@@ -43,7 +43,6 @@ def bust_paywall(status)
   if status.user.screen_name.downcase == 'theeconomist'
     puts "analyzed one economist tweet"
     raw_text = economist_fetch_headline(status.urls[0].attrs[:expanded_url])
-    # raw_text = "test tweet headline"
   
     #google queryify the headline
     url = google_headlineify(raw_text)
@@ -51,7 +50,7 @@ def bust_paywall(status)
     consumer_key = OAuth::Consumer.new(KEYS[:consumer_key_string], KEYS[:consumer_secret_string])
     access_token = OAuth::Token.new(KEYS[:access_token_string], KEYS[:access_secret_string])
     handle = "@" + status.user.screen_name
-    #respond to tweet with link to google results
+    #respond to tweet with link to google results only if a useful headline is found
     unless (url ==  "https://www.google.com/#q=")
       send_response_tweet(status.id, handle, url, consumer_key, access_token)
     end
@@ -59,6 +58,7 @@ def bust_paywall(status)
 end
 
 def google_headlineify(text)
+  #this method takes in text and constructs the appropriate google url to visit to find the origin article
   words_arr = text.split(" ")
   url = "https://www.google.com/#q="
   words_arr.each_with_index do |word, idx|
@@ -94,9 +94,7 @@ def send_response_tweet(tweet_id, user, google_link, consumer_key, access_token)
   response = http.request(request)
 end
 
-# def economist_fetch_headline()
 def economist_fetch_headline(url)
-  puts url
   doc = Nokogiri::HTML(open(url))
   # doc = Nokogiri::HTML(open('http://www.economist.com/news/leaders/21633813-it-closer-crisis-west-or-vladimir-putin-realise-wounded-economy'))
   h2 = doc.css('h2.fly-title').text
@@ -111,6 +109,7 @@ client = TweetStream::Client.new
 
 #me = 24480915
 #economist = 5988062
+#FT = 18949452
 
 client.follow(5988062) do |status|
   # puts (status.methods - Array.methods)
@@ -136,6 +135,7 @@ client.follow(5988062) do |status|
   #
   # # puts status[:entities][:urls][:expanded_url]
 
-  bust_paywall(status)
+  #bust_paywall(status)
+  puts "works"
 end
 
