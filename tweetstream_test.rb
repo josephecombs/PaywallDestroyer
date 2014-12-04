@@ -4,7 +4,9 @@ require 'json'
 require 'open-uri'
 require 'nokogiri'
 require 'tweetstream'
-Dir["/site_specific_logic/*.rb"].each {|file| require file }
+require 'require_all'
+require_all 'site_specific_logic'
+# require_relative 'site_specific_logic/me.rb'
 
 def get_credentials(filename)
   #get your own keys if you are going to use this --> apps.twitter.com
@@ -36,14 +38,12 @@ TweetStream.configure do |config|
   config.auth_method        = :oauth
 end
 
-def bust_paywall(status, publication_arr)
+def bust_paywall(status, publication_hash)
   puts "analyzed one tweet"
   puts status.text
-  #turn this back on in production later when you add more media entities
-  if status.user.screen_name.downcase == publication_arr[1]
-    puts "analyzed one economist tweet"
-    # raw_text = economist_fetch_headline(status.urls[0].attrs[:expanded_url])
-    raw_text = send((publication_arr[2].to_s + '_fetch_headline').to_sym, status.urls[0].attrs[:expanded_url])
+  # turn this back on in production later when you add more media entities
+  if status.user.screen_name.downcase == publication_hash[:twitter_screen_name]
+    raw_text = send((publication_hash[:convention_placeholder].to_s + '_fetch_headline').to_sym, status.urls[0].attrs[:expanded_url])
 
     #google queryify the headline
     url = google_headlineify(raw_text)
@@ -52,8 +52,10 @@ def bust_paywall(status, publication_arr)
     access_token = OAuth::Token.new(KEYS[:access_token_string], KEYS[:access_secret_string])
     handle = "@" + status.user.screen_name
     #respond to tweet with link to google results only if a useful headline is found
+
     unless (url ==  "https://www.google.com/#q=")
       send_response_tweet(status.id, handle, url, consumer_key, access_token)
+      # puts "this is where I would post a tweet"
     end
   end
 end
@@ -111,16 +113,16 @@ client = TweetStream::Client.new
 
 #keys must be named according to convention - economist -> economist_fetch_headline; financial_times -> financial_times_fetch_headline
 ARGS_MAP = {
-  me: [24480915, 'josephcombs', :me],
-  economist: [5988062, 'theeconomist', :economist],
-  financial_times: [18949452, 'FT', :financial_times]
+  me: { twitter_id: 24480915, twitter_screen_name: 'josephcombs', convention_placeholder: :me },
+  economist: { twitter_id: 5988062, twitter_screen_name: 'theeconomist', convention_placeholder: :economist },
+  financial_times: { twitter_id: 18949452, twitter_screen_name: 'FT', convention_placeholder: :financial_times }
 }
 
 puts (ARGS_MAP[:me])
-puts (ARGV[0].to_sym)
 puts (ARGS_MAP[ARGV[0].to_sym])
+puts (ARGS_MAP[ARGV[0].to_sym])[:twitter_id]
 
-client.follow(ARGS_MAP[ARGV[0][0].to_sym]) do |status|
+client.follow((ARGS_MAP[ARGV[0].to_sym])[:twitter_id]) do |status|
   # puts (status.methods - Array.methods)
   # puts "========================"
   # # ##DEPRECATED METHOD##
@@ -144,7 +146,7 @@ client.follow(ARGS_MAP[ARGV[0][0].to_sym]) do |status|
   #
   # # puts status[:entities][:urls][:expanded_url]
 
-  bust_paywall(status, ARGS_MAP[ARGV[0]])
+  bust_paywall(status, ARGS_MAP[ARGV[0].to_sym])
   # puts "hi joe!"
   # puts ARGV[0]
 end
