@@ -38,11 +38,11 @@ TweetStream.configure do |config|
   config.auth_method        = :oauth
 end
 
-def bust_paywall(status, publication_hash)
+def bust_paywall(status, publication_hash)  
   puts "analyzed one tweet"
   puts status.text
   # turn this back on in production later when you add more media entities
-  if status.user.screen_name.downcase == publication_hash[:twitter_screen_name]
+  if status.user.screen_name.downcase == publication_hash[:twitter_screen_name].downcase
     raw_text = send((publication_hash[:convention_placeholder].to_s + '_fetch_headline').to_sym, status.urls[0].attrs[:expanded_url])
 
     #google queryify the headline
@@ -118,36 +118,7 @@ ARGS_MAP = {
   financial_times: { twitter_id: 18949452, twitter_screen_name: 'FT', convention_placeholder: :financial_times }
 }
 
-puts (ARGS_MAP[:me])
-puts (ARGS_MAP[ARGV[0].to_sym])
-puts (ARGS_MAP[ARGV[0].to_sym])[:twitter_id]
-
 client.follow((ARGS_MAP[ARGV[0].to_sym])[:twitter_id]) do |status|
-  # puts (status.methods - Array.methods)
-  # puts "========================"
-  # # ##DEPRECATED METHOD##
-  # # puts status.user[:screen_name]
-  # # ##NEW METHOD##
-  # puts "new way hopefully works:"
-  # puts status.user.screen_name
-  # puts "========================"
-  # puts status.text
-  # puts "========================"
-  # puts status.id
-  # puts "========================"
-  # puts status.urls
-  # # puts "========================"
-  # # p status.urls
-  # puts "========================"
-  #####CORRECT !!! - gets the url from the tweet######
-  # puts status.urls[0].attrs[:expanded_url]
-  # # p status.urls.attrs[:url]
-  # puts "========================"
-  #
-  # # puts status[:entities][:urls][:expanded_url]
-
   bust_paywall(status, ARGS_MAP[ARGV[0].to_sym])
-  # puts "hi joe!"
-  # puts ARGV[0]
 end
 
