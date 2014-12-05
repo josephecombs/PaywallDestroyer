@@ -57,6 +57,8 @@ def bust_paywall(status, publication_hash)
       send_response_tweet(status.id, handle, url, consumer_key, access_token)
       # puts "this is where I would post a tweet"
     end
+    
+    puts "analyzed one #{handle} tweet"
   end
 end
 
