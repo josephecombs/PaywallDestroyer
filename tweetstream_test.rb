@@ -99,18 +99,6 @@ def send_response_tweet(tweet_id, user, google_link, consumer_key, access_token)
   response = http.request(request)
 end
 
-# def economist_fetch_headline(url)
-#   #this method accepts a url of a news article and returns text
-#   doc = Nokogiri::HTML(open(url))
-#   # doc = Nokogiri::HTML(open('http://www.economist.com/news/leaders/21633813-it-closer-crisis-west-or-vladimir-putin-realise-wounded-economy'))
-#   h2 = doc.css('h2.fly-title').text
-#   puts h2
-#   h3 = doc.css('h3.headline').text
-#   puts h3
-#   raw_headline = h2 + " " + h3
-#   raw_headline
-# end
-
 client = TweetStream::Client.new
 
 #keys must be named according to convention - economist -> economist_fetch_headline; financial_times -> financial_times_fetch_headline
@@ -121,6 +109,7 @@ ARGS_MAP = {
 }
 
 client.follow((ARGS_MAP[ARGV[0].to_sym])[:twitter_id]) do |status|
-  bust_paywall(status, ARGS_MAP[ARGV[0].to_sym])
+  puts status.text
+  puts "analyzed a tweet"
+  # bust_paywall(status, ARGS_MAP[ARGV[0].to_sym])
 end
-
