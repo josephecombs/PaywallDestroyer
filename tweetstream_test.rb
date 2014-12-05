@@ -47,7 +47,8 @@ def bust_paywall(status, publication_hash)
 
     #google queryify the headline
     url = google_headlineify(raw_text)
-  
+    
+    #oauth junk
     consumer_key = OAuth::Consumer.new(KEYS[:consumer_key_string], KEYS[:consumer_secret_string])
     access_token = OAuth::Token.new(KEYS[:access_token_string], KEYS[:access_secret_string])
     handle = "@" + status.user.screen_name
@@ -109,7 +110,5 @@ ARGS_MAP = {
 }
 
 client.follow((ARGS_MAP[ARGV[0].to_sym])[:twitter_id]) do |status|
-  puts status.text
-  puts "analyzed a tweet"
-  # bust_paywall(status, ARGS_MAP[ARGV[0].to_sym])
+  bust_paywall(status, ARGS_MAP[ARGV[0].to_sym])
 end
