@@ -106,7 +106,9 @@ client = TweetStream::Client.new
 ARGS_MAP = {
   me: { twitter_id: 24480915, twitter_screen_name: 'josephcombs', convention_placeholder: :me },
   economist: { twitter_id: 5988062, twitter_screen_name: 'theeconomist', convention_placeholder: :economist },
-  financial_times: { twitter_id: 18949452, twitter_screen_name: 'FT', convention_placeholder: :financial_times }
+  financial_times: { twitter_id: 18949452, twitter_screen_name: 'FT', convention_placeholder: :financial_times },
+  wall_street_journal: { twitter_id: 3108351, twitter_screen_name: 'WSJ', convention_placeholder: :wall_street_journal },
+  new_york_times: { twitter_id: 807095, twitter_screen_name: 'nytimes', convention_placeholder: :new_york_times },
 }
 
 client.follow((ARGS_MAP[ARGV[0].to_sym])[:twitter_id]) do |status|
